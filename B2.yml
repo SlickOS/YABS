@@ -59,3 +59,42 @@ Projects:
   - Name: Release
     Flags:
       C++: -O2 -DRELEASE
+
+###############################################################################
+# Jobs                                                                        #
+###############################################################################
+Jobs:
+  - Name: Compile
+
+  - Name: Build
+    Iterate:
+      - Set: $(Architectures)
+        Value: $(Arch)
+      - Set: $(Configurations)
+        Value: $(Config)
+      - Set: $(Projects)
+        Value: $(Project)
+    Tasks:
+      - Command: Compile
+        Arguments:
+          - $()
+      - Command: Link
+
+  - Name: Clean
+    Tasks:
+      - Command: Remove-Objects
+        Arguments:
+          - Build
+
+  - Name: Rebuild
+    Dependencies:
+      - Clean
+      - Build
+
+Tasks:
+  - Name: Remove
+    Stages:
+      - Command: rm -rf $(0)
+  - Name: Compile
+    Stages:
+      - Command: $()

@@ -7,8 +7,8 @@ Name: BTool
 # Output File Layout                                                          #
 ###############################################################################
 Output:
-  Objects: Build/Objects/%(ARCH)/%(CONFIG)/%(PROJECT)/%(OBJECT)
-  Binaries: Build/Binaries/%(ARCH)/%(CONFIG)/%(PROJECT)
+  Objects: Build/Objects/%(Architecture)/%(Configuration)/%(Project)/%(Object)
+  Binaries: Build/Binaries/%(Architecture)/%(Configuration)/%(Project)
 
 ###############################################################################
 # Global Options                                                              #

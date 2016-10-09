@@ -23,6 +23,12 @@ bool Util::NeedToRebuild(const std::string &obj, const std::string &src) {
     return (fs::last_write_time(srcPath) > fs::last_write_time(objPath));
 }
 
+void Util::CleanDir(const std::string &name) {
+    fs::path dir(name);
+    //std::cout << dir.generic_string() << std::endl;
+    fs::remove_all(dir);
+}
+
 bool Util::CheckDirFromFile(const std::string &name) {
     return fs::exists(fs::path(name).parent_path());
 }
@@ -33,7 +39,7 @@ bool Util::CheckDir(const std::string &name) {
 
 void Util::CreateDirFromFile(const std::string &name) {
     if (Util::CheckDirFromFile(name)) return;
-    std::cout << "Making Dir!" << std::endl;
+    //std::cout << "Making Dir!" << std::endl;
     fs::create_directories(fs::path(name).parent_path());
 }
 

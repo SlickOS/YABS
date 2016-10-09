@@ -1,0 +1,95 @@
+###############################################################################
+# Tool Definitions                                                            #
+###############################################################################
+Tools:
+  - Name: C++
+    Type: Compiler
+    Architectures:
+      - Name: Native
+        Command: g++
+
+  - Name: Linker
+    Type: Linker
+    Architectures:
+      - Name: Native
+        Command: g++
+
+  - Name: Remove
+    Type: File Manipulation
+    Command: rm
+
+###############################################################################
+# Configuration-Specific Options                                              #
+###############################################################################
+Configurations:
+  - Name: Debug
+    Flags:
+      - C++
+        - Flag: Enable Debug Info
+        - Flag: Define
+          Argument: DEBUG
+
+###############################################################################
+# Global Options                                                              #
+###############################################################################
+Flags:
+  - C++
+    - Flag: Common Warnings
+    - Flag: Extra Warnings
+    - Flag: Include Directory
+      Argument: Include
+    - Flag: C++ Version
+      Argument: C++14
+
+  - Linker
+    - Flag: Library Directory
+      Argument: Library
+
+###############################################################################
+# Project-Specific Options                                                    #
+###############################################################################
+Projects:
+  - Name: BTool
+    Configurations:
+      - Debug
+    Tools:
+      - Name: C++
+        Architectures:
+          - Native
+        Sources:
+          - Source
+        Objects:
+          - Build/Objects/@Configuration/@Architecture/@Name
+
+      - Name: Linker
+        Architectures:
+          - Native
+        Objects:
+          - Build/Objects/@Configuration/@Architecture/@Name
+        Libraries:
+          - yaml-cpp
+          - stdc++fs
+        Binary:
+          - Build/Binaries/@Configuration/@Architecture/@Name
+
+      - Name: Remove
+        Directories:
+          - Build
+
+###############################################################################
+# Jobs                                                                        #
+###############################################################################
+Jobs:
+  - Name: Build
+    Tasks:
+      - C++
+      - Linker
+
+  - Name: Clean
+    Tasks:
+      - Remove
+
+  - Name: Rebuild
+    Dependencies:
+      - Clean
+      - Build

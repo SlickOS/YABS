@@ -8,9 +8,14 @@
 int main(int argc, char **argv) {
     std::string buildConfig = "Build.yml";
 
+    std::string cmd = "default";
     if (argc == 2) {
-        std::string cmd = argv[2];
-        if (cmd == "clean") Util::CleanDir("Build");
+        cmd = argv[1];
+    }
+
+    if (cmd == "clean") {
+        Util::CleanDir("Build");
+        return 0;
     }
 
     Workspace workspace;
@@ -78,14 +83,14 @@ int main(int argc, char **argv) {
         for (auto config : workspace.GetConfigurations()) {
             for (auto arch : workspace.GetArchitectures()) {
                 auto objOut = workspace.GetOutputObject();
-                objOut = Util::ReplaceString(objOut, "%(ARCH)", arch.GetName());
-                objOut = Util::ReplaceString(objOut, "%(CONFIG)", config.GetName());
-                objOut = Util::ReplaceString(objOut, "%(PROJECT)", project.GetName());
+                objOut = Util::ReplaceString(objOut, "%(Architecture)", arch.GetName());
+                objOut = Util::ReplaceString(objOut, "%(Configuration)", config.GetName());
+                objOut = Util::ReplaceString(objOut, "%(Project)", project.GetName());
 
                 auto binOut = workspace.GetOutputBinary();
-                binOut = Util::ReplaceString(binOut, "%(ARCH)", arch.GetName());
-                binOut = Util::ReplaceString(binOut, "%(CONFIG)", config.GetName());
-                binOut = Util::ReplaceString(binOut, "%(PROJECT)", project.GetName());
+                binOut = Util::ReplaceString(binOut, "%(Architecture)", arch.GetName());
+                binOut = Util::ReplaceString(binOut, "%(Configuration)", config.GetName());
+                binOut = Util::ReplaceString(binOut, "%(Project)", project.GetName());
 
                 std::vector<std::string> srcC;
                 std::vector<std::string> srcCXX;
@@ -108,17 +113,17 @@ int main(int argc, char **argv) {
 
                 for (auto file : srcC) {
                     std::string obj = Util::ReplaceString(file, ".c", ".c.o");
-                    std::string out = Util::ReplaceString(objOut, "%(OBJECT)", obj);
+                    std::string out = Util::ReplaceString(objOut, "%(Object)", obj);
                     objC.push_back(out);
                 }
                 for (auto file : srcCXX) {
                     std::string obj = Util::ReplaceString(file, ".cpp", ".cpp.o");
-                    std::string out = Util::ReplaceString(objOut, "%(OBJECT)", obj);
+                    std::string out = Util::ReplaceString(objOut, "%(Object)", obj);
                     objCXX.push_back(out);
                 }
                 for (auto file : srcASM) {
                     std::string obj = Util::ReplaceString(file, ".asm", ".asm.o");
-                    std::string out = Util::ReplaceString(objOut, "%(OBJECT)", obj);
+                    std::string out = Util::ReplaceString(objOut, "%(Object)", obj);
                     objASM.push_back(out);
                 }
 
@@ -134,9 +139,10 @@ int main(int argc, char **argv) {
                     if (!Util::NeedToRebuild(objC[i], srcC[i])/* && !Util::NeedToRebuild(objC[i], buildConfig)*/) continue;
                     linkFlag = true;
                     std::string cmd = cmdC + "-c -o " + objC[i] + " " + srcC[i];
+                    std::cout << "Compiling " << srcC[i] << " -> " << objC[i] << std::endl;
                     //std::cout << cmd << std::endl;
                     Util::CreateDirFromFile(objC[i]);
-                    if (system(cmd.c_str()) != 0) std::cout << "Error: Linker" << std::endl;
+                    system(cmd.c_str());
                 }
                 std::string cmdCXX = arch.GetTools().GetCXX() + " ";
                 cmdCXX += arch.GetFlags().GetCXX() + " ";
@@ -147,9 +153,10 @@ int main(int argc, char **argv) {
                     if (!Util::NeedToRebuild(objCXX[i], srcCXX[i])/* && !Util::NeedToRebuild(objC[i], buildConfig)*/) continue;
                     linkFlag = true;
                     std::string cmd = cmdCXX + "-c -o " + objCXX[i] + " " + srcCXX[i];
+                    std::cout << "Compiling " << srcCXX[i] << " -> " << objCXX[i] << std::endl;
                     //std::cout << cmd << std::endl;
                     Util::CreateDirFromFile(objCXX[i]);
-                    if (system(cmd.c_str()) != 0) std::cout << "Error: Linker" << std::endl;
+                    system(cmd.c_str());
                 }
                 std::string cmdASM = arch.GetTools().GetASM() + " ";
                 cmdASM += arch.GetFlags().GetASM() + " ";
@@ -160,9 +167,10 @@ int main(int argc, char **argv) {
                     if (!Util::NeedToRebuild(objASM[i], srcASM[i])/* && !Util::NeedToRebuild(objC[i], buildConfig)*/) continue;
                     linkFlag = true;
                     std::string cmd = cmdASM + "-c -o " + objASM[i] + " " + srcASM[i];
+                    std::cout << "Assembling " << srcASM[i] << " -> " << objASM[i] << std::endl;
                     //std::cout << cmd << std::endl;
                     Util::CreateDirFromFile(objASM[i]);
-                    if (system(cmd.c_str()) != 0) std::cout << "Error: Linker" << std::endl;
+                    system(cmd.c_str());
                 }
 
                 if (linkFlag) {
@@ -179,8 +187,9 @@ int main(int argc, char **argv) {
                     }
                     Util::CreateDirFromFile(binOut);
                     cmdLink += arch.GetFlags().GetLD() + " " + config.GetFlags().GetLD() + " " + project.GetFlags().GetLD() + " " + workspace.GetFlags().GetLD() + " ";
+                    std::cout << "Linking " << binOut << std::endl;
                     //std::cout << cmdLink << std::endl;
-                    if (system(cmdLink.c_str()) != 0) std::cout << "Error: Linker" << std::endl;
+                    system(cmdLink.c_str());
                 }
             }
         }
