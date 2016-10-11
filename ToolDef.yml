@@ -1,0 +1,23 @@
+Name: C++
+Variables:
+  Compiler: g++
+Rules:
+  - Name: Compile
+    Arguments:
+      - Flags: Multiple
+      - Source: Single
+      - Object: Single
+    Platforms:
+      - Linux: @Compiler @Flags -c -o @Object @Source
+  - Name: Link
+    Arguments:
+      - Flags: Multiple
+      - Objects: Multiple
+      - Libraries: Multiple
+      - Output: Single
+    Platforms:
+      - Linux: @Compiler @Flags -o @Output @Objects @Libraries
+      
+# You can use this with:              C++ Compile @Flags:@MyFlags @Source:+Each(@MySources) @Object:+Each(@MyObjects)
+# You can also use as:                C++ Link @Flags:@MyLinkFlags @Objects:@MyObjects @Libraries:@MyLibraries @Output:@MyOutput
+# If you want to change the compiler: C++ Compile @Compiler:clang @Flags:@MyFlags @Source:+Each(@MySources) @Object:+Each(@MyObjects)
