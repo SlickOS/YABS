@@ -4,19 +4,18 @@
 Tools:
   - Name: C++
     Type: Compiler
-    Architectures:
-      - Name: Native
-        Command: g++
+    Platforms:
+      - Native: g++ @Flags -c -o @Output @Input
 
   - Name: Linker
     Type: Linker
-    Architectures:
-      - Name: Native
-        Command: g++
+    Platforms:
+      - Native: g++ @Flags -o @Output @Inputs
 
   - Name: Remove
-    Type: File Manipulation
-    Command: rm
+    Type: Shell
+    Platforms:
+      - Native: rm -rf
 
 ###############################################################################
 # Configuration-Specific Options                                              #
@@ -24,26 +23,14 @@ Tools:
 Configurations:
   - Name: Debug
     Flags:
-      - C++
-        - Flag: Enable Debug Info
-        - Flag: Define
-          Argument: DEBUG
+      - C++: -g -DDEBUG
 
 ###############################################################################
 # Global Options                                                              #
 ###############################################################################
 Flags:
-  - C++
-    - Flag: Common Warnings
-    - Flag: Extra Warnings
-    - Flag: Include Directory
-      Argument: Include
-    - Flag: C++ Version
-      Argument: C++14
-
-  - Linker
-    - Flag: Library Directory
-      Argument: Library
+  - C++: -Wall -Wextra -IInclude -std=c++14
+  - Linker: -LLibrary
 
 ###############################################################################
 # Project-Specific Options                                                    #
@@ -53,28 +40,21 @@ Projects:
     Configurations:
       - Debug
     Tools:
-      - Name: C++
-        Architectures:
-          - Native
-        Sources:
-          - Source
-        Objects:
-          - Build/Objects/@Configuration/@Architecture/@Name
-
-      - Name: Linker
-        Architectures:
-          - Native
-        Objects:
-          - Build/Objects/@Configuration/@Architecture/@Name
-        Libraries:
-          - yaml-cpp
-          - stdc++fs
-        Binary:
-          - Build/Binaries/@Configuration/@Architecture/@Name
-
-      - Name: Remove
+      - Name: C++ @Native
         Directories:
-          - Build
+          - Input: Source *.cpp
+            Output: Build/Objects/@Configuration/@Platform *.o
+
+      - Name: Linker @Native
+        Directories:
+          - Input: Build/Objects/@Configuration/@Platform *.o
+        Files:
+          - Input: yaml-cpp stdc++fs
+            Output: Build/Binaries/@Configuration/@Platform/@ProjectName
+
+      - Name: Remove @Native
+        Directories:
+          - Input: Build
 
 ###############################################################################
 # Jobs                                                                        #

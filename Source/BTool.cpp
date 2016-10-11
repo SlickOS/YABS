@@ -7,19 +7,95 @@
 
 int main(int argc, char **argv) {
     std::string buildConfig = "Build.yml";
+    std::string command = "Build";
 
-    std::string cmd = "default";
-    if (argc == 2) {
-        cmd = argv[1];
-    }
-
-    if (cmd == "clean") {
-        Util::CleanDir("Build");
-        return 0;
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+        if (arg == "-h" || arg == "--help") {
+            std::cout << "You don't get any help." << std::endl;
+        }
+        else if (arg == "-f" || arg == "--file") {
+            if (argc > i + 1) {
+                buildConfig = argv[++i];
+            }
+            else {
+                std::cout << "Expected build configuration file." << std::endl;
+                return -1;
+            }
+        }
+        else {
+            command = argv[i];
+        }
     }
 
     Workspace workspace;
     workspace.Parse(YAML::LoadFile(buildConfig));
+
+    // std::cout << "Tools:" << std::endl;
+    // for (auto tool : workspace.GetTools()) {
+    //     std::cout << "- " << tool.GetName() << std::endl;
+    //     std::cout << "  Type: ";
+    //     if (tool.GetType() == Tool::Type::Compiler) {
+    //         std::cout << "Compiler" << std::endl;
+    //     }
+    //     else if (tool.GetType() == Tool::Type::Linker) {
+    //         std::cout << "Linker" << std::endl;
+    //     }
+    //     else if (tool.GetType() == Tool::Type::Shell) {
+    //         std::cout << "Shell" << std::endl;
+    //     }
+    //     std::cout << "  Platforms:" << std::endl;
+    //     for (auto it = tool.GetPlatforms().begin(); it != tool.GetPlatforms().end(); it++) {
+    //         std::cout << "  - " << it->first << ": " << it->second << std::endl;
+    //     }
+    // }
+
+    // std::cout << "Configurations:" << std::endl;
+    // for (auto conf : workspace.GetConfigurations()) {
+    //     std::cout << "- " << conf.GetName() << std::endl;
+    //     std::cout << "  Flags:" << std::endl;
+    //     for (auto it = conf.GetFlags().begin(); it != conf.GetFlags().end(); it++) {
+    //         std::cout << "  - " << it->first << ": " << it->second << std::endl;
+    //     }
+    // }
+
+    // std::cout << "Global Flags:" << std::endl;
+    // for (auto it = workspace.GetFlags().begin(); it != workspace.GetFlags().end(); it++) {
+    //     std::cout << "  - " << it->first << ": " << it->second << std::endl;
+    // }
+
+    // std::cout << "Projects:" << std::endl;
+    // for (auto project : workspace.GetProjects()) {
+    //     std::cout << "- " << project.GetName() << std::endl;
+    //     std::cout << "  Configurations: " << std::endl;
+    //     for (auto conf : project.GetConfigurations()) {
+    //         std::cout << "  - " << conf << std::endl;
+    //     }
+    //     std::cout << "  Tools: " << std::endl;
+    //     for (auto tool : project.GetTools()) {
+    //         std::cout << "  - " << tool.GetName() << std::endl;
+    //         std::cout << "    Directories:" << std::endl;
+    //         for (auto it = tool.GetDirectories().begin(); it != tool.GetDirectories().end(); it++) {
+    //             std::cout << "    - " << it->first.first;
+    //             if (!it->first.second.empty()) std::cout << " (" << it->first.second << ")";
+    //             if (!it->second.first.empty()) std::cout << ": " << it->second.first;
+    //             if (!it->second.second.empty()) std::cout << " (" << it->second.second << ")";
+    //             std::cout << std::endl;
+    //         }
+    //         std::cout << "    Files:" << std::endl;
+    //         for (auto it = tool.GetFiles().begin(); it != tool.GetFiles().end(); it++) {
+    //             std::cout << "    - " << it->first << ": " << it->second << std::endl;
+    //         }
+    //     }
+    // }
+
+    std::vector<Job> jobs = workspace.GetJobs();
+
+    for (auto job : jobs) {
+        if (job.GetName() == command) {
+            std::cout << "Executing '" << job.GetName() << "'" << std::endl;
+        }
+    }
 
     // std::cout << "Workspace: " << workspace.GetName() << std::endl;
     // if (!workspace.GetFlags().GetC().empty()) std::cout << "  C Flags: " << workspace.GetFlags().GetC() << std::endl;
@@ -79,121 +155,121 @@ int main(int argc, char **argv) {
     // }
 
     // DO THE BUILD PROCESS!!
-    for (auto project : workspace.GetProjects()) {
-        for (auto config : workspace.GetConfigurations()) {
-            for (auto arch : workspace.GetArchitectures()) {
-                auto objOut = workspace.GetOutputObject();
-                objOut = Util::ReplaceString(objOut, "%(Architecture)", arch.GetName());
-                objOut = Util::ReplaceString(objOut, "%(Configuration)", config.GetName());
-                objOut = Util::ReplaceString(objOut, "%(Project)", project.GetName());
+    // for (auto project : workspace.GetProjects()) {
+    //     for (auto config : workspace.GetConfigurations()) {
+    //         for (auto arch : workspace.GetArchitectures()) {
+    //             auto objOut = workspace.GetOutputObject();
+    //             objOut = Util::ReplaceString(objOut, "%(Architecture)", arch.GetName());
+    //             objOut = Util::ReplaceString(objOut, "%(Configuration)", config.GetName());
+    //             objOut = Util::ReplaceString(objOut, "%(Project)", project.GetName());
 
-                auto binOut = workspace.GetOutputBinary();
-                binOut = Util::ReplaceString(binOut, "%(Architecture)", arch.GetName());
-                binOut = Util::ReplaceString(binOut, "%(Configuration)", config.GetName());
-                binOut = Util::ReplaceString(binOut, "%(Project)", project.GetName());
+    //             auto binOut = workspace.GetOutputBinary();
+    //             binOut = Util::ReplaceString(binOut, "%(Architecture)", arch.GetName());
+    //             binOut = Util::ReplaceString(binOut, "%(Configuration)", config.GetName());
+    //             binOut = Util::ReplaceString(binOut, "%(Project)", project.GetName());
 
-                std::vector<std::string> srcC;
-                std::vector<std::string> srcCXX;
-                std::vector<std::string> srcASM;
+    //             std::vector<std::string> srcC;
+    //             std::vector<std::string> srcCXX;
+    //             std::vector<std::string> srcASM;
 
-                if (!project.GetFiles().GetSources().empty()) {
-                    for (auto dir : project.GetFiles().GetSources()) {
-                        auto curC = Util::FindFiles(dir, "c");
-                        srcC.insert(std::end(srcC), std::begin(curC), std::end(curC));
-                        auto curCXX = Util::FindFiles(dir, "cpp");
-                        srcCXX.insert(std::end(srcCXX), std::begin(curCXX), std::end(curCXX));
-                        auto curASM = Util::FindFiles(dir, "asm");
-                        srcASM.insert(std::end(srcASM), std::begin(curASM), std::end(curASM));
-                    }
-                }
+    //             if (!project.GetFiles().GetSources().empty()) {
+    //                 for (auto dir : project.GetFiles().GetSources()) {
+    //                     auto curC = Util::FindFiles(dir, "c");
+    //                     srcC.insert(std::end(srcC), std::begin(curC), std::end(curC));
+    //                     auto curCXX = Util::FindFiles(dir, "cpp");
+    //                     srcCXX.insert(std::end(srcCXX), std::begin(curCXX), std::end(curCXX));
+    //                     auto curASM = Util::FindFiles(dir, "asm");
+    //                     srcASM.insert(std::end(srcASM), std::begin(curASM), std::end(curASM));
+    //                 }
+    //             }
 
-                std::vector<std::string> objC;
-                std::vector<std::string> objCXX;
-                std::vector<std::string> objASM;
+    //             std::vector<std::string> objC;
+    //             std::vector<std::string> objCXX;
+    //             std::vector<std::string> objASM;
 
-                for (auto file : srcC) {
-                    std::string obj = Util::ReplaceString(file, ".c", ".c.o");
-                    std::string out = Util::ReplaceString(objOut, "%(Object)", obj);
-                    objC.push_back(out);
-                }
-                for (auto file : srcCXX) {
-                    std::string obj = Util::ReplaceString(file, ".cpp", ".cpp.o");
-                    std::string out = Util::ReplaceString(objOut, "%(Object)", obj);
-                    objCXX.push_back(out);
-                }
-                for (auto file : srcASM) {
-                    std::string obj = Util::ReplaceString(file, ".asm", ".asm.o");
-                    std::string out = Util::ReplaceString(objOut, "%(Object)", obj);
-                    objASM.push_back(out);
-                }
+    //             for (auto file : srcC) {
+    //                 std::string obj = Util::ReplaceString(file, ".c", ".c.o");
+    //                 std::string out = Util::ReplaceString(objOut, "%(Object)", obj);
+    //                 objC.push_back(out);
+    //             }
+    //             for (auto file : srcCXX) {
+    //                 std::string obj = Util::ReplaceString(file, ".cpp", ".cpp.o");
+    //                 std::string out = Util::ReplaceString(objOut, "%(Object)", obj);
+    //                 objCXX.push_back(out);
+    //             }
+    //             for (auto file : srcASM) {
+    //                 std::string obj = Util::ReplaceString(file, ".asm", ".asm.o");
+    //                 std::string out = Util::ReplaceString(objOut, "%(Object)", obj);
+    //                 objASM.push_back(out);
+    //             }
 
-                std::string cmdC = arch.GetTools().GetC() + " ";
-                cmdC += arch.GetFlags().GetC() + " ";
-                cmdC += config.GetFlags().GetC() + " ";
-                cmdC += project.GetFlags().GetC() + " ";
-                cmdC += workspace.GetFlags().GetC() + " ";
+    //             std::string cmdC = arch.GetTools().GetC() + " ";
+    //             cmdC += arch.GetFlags().GetC() + " ";
+    //             cmdC += config.GetFlags().GetC() + " ";
+    //             cmdC += project.GetFlags().GetC() + " ";
+    //             cmdC += workspace.GetFlags().GetC() + " ";
 
-                bool linkFlag = false;
+    //             bool linkFlag = false;
 
-                for (size_t i = 0; i < objC.size(); i++) {
-                    if (!Util::NeedToRebuild(objC[i], srcC[i])/* && !Util::NeedToRebuild(objC[i], buildConfig)*/) continue;
-                    linkFlag = true;
-                    std::string cmd = cmdC + "-c -o " + objC[i] + " " + srcC[i];
-                    std::cout << "Compiling " << srcC[i] << " -> " << objC[i] << std::endl;
-                    //std::cout << cmd << std::endl;
-                    Util::CreateDirFromFile(objC[i]);
-                    system(cmd.c_str());
-                }
-                std::string cmdCXX = arch.GetTools().GetCXX() + " ";
-                cmdCXX += arch.GetFlags().GetCXX() + " ";
-                cmdCXX += config.GetFlags().GetCXX() + " ";
-                cmdCXX += project.GetFlags().GetCXX() + " ";
-                cmdCXX += workspace.GetFlags().GetCXX() + " ";
-                for (size_t i = 0; i < objCXX.size(); i++) {
-                    if (!Util::NeedToRebuild(objCXX[i], srcCXX[i])/* && !Util::NeedToRebuild(objC[i], buildConfig)*/) continue;
-                    linkFlag = true;
-                    std::string cmd = cmdCXX + "-c -o " + objCXX[i] + " " + srcCXX[i];
-                    std::cout << "Compiling " << srcCXX[i] << " -> " << objCXX[i] << std::endl;
-                    //std::cout << cmd << std::endl;
-                    Util::CreateDirFromFile(objCXX[i]);
-                    system(cmd.c_str());
-                }
-                std::string cmdASM = arch.GetTools().GetASM() + " ";
-                cmdASM += arch.GetFlags().GetASM() + " ";
-                cmdASM += config.GetFlags().GetASM() + " ";
-                cmdASM += project.GetFlags().GetASM() + " ";
-                cmdASM += workspace.GetFlags().GetASM() + " ";
-                for (size_t i = 0; i < objASM.size(); i++) {
-                    if (!Util::NeedToRebuild(objASM[i], srcASM[i])/* && !Util::NeedToRebuild(objC[i], buildConfig)*/) continue;
-                    linkFlag = true;
-                    std::string cmd = cmdASM + "-c -o " + objASM[i] + " " + srcASM[i];
-                    std::cout << "Assembling " << srcASM[i] << " -> " << objASM[i] << std::endl;
-                    //std::cout << cmd << std::endl;
-                    Util::CreateDirFromFile(objASM[i]);
-                    system(cmd.c_str());
-                }
+    //             for (size_t i = 0; i < objC.size(); i++) {
+    //                 if (!Util::NeedToRebuild(objC[i], srcC[i])/* && !Util::NeedToRebuild(objC[i], buildConfig)*/) continue;
+    //                 linkFlag = true;
+    //                 std::string cmd = cmdC + "-c -o " + objC[i] + " " + srcC[i];
+    //                 std::cout << "Compiling " << srcC[i] << " -> " << objC[i] << std::endl;
+    //                 //std::cout << cmd << std::endl;
+    //                 Util::CreateDirFromFile(objC[i]);
+    //                 system(cmd.c_str());
+    //             }
+    //             std::string cmdCXX = arch.GetTools().GetCXX() + " ";
+    //             cmdCXX += arch.GetFlags().GetCXX() + " ";
+    //             cmdCXX += config.GetFlags().GetCXX() + " ";
+    //             cmdCXX += project.GetFlags().GetCXX() + " ";
+    //             cmdCXX += workspace.GetFlags().GetCXX() + " ";
+    //             for (size_t i = 0; i < objCXX.size(); i++) {
+    //                 if (!Util::NeedToRebuild(objCXX[i], srcCXX[i])/* && !Util::NeedToRebuild(objC[i], buildConfig)*/) continue;
+    //                 linkFlag = true;
+    //                 std::string cmd = cmdCXX + "-c -o " + objCXX[i] + " " + srcCXX[i];
+    //                 std::cout << "Compiling " << srcCXX[i] << " -> " << objCXX[i] << std::endl;
+    //                 //std::cout << cmd << std::endl;
+    //                 Util::CreateDirFromFile(objCXX[i]);
+    //                 system(cmd.c_str());
+    //             }
+    //             std::string cmdASM = arch.GetTools().GetASM() + " ";
+    //             cmdASM += arch.GetFlags().GetASM() + " ";
+    //             cmdASM += config.GetFlags().GetASM() + " ";
+    //             cmdASM += project.GetFlags().GetASM() + " ";
+    //             cmdASM += workspace.GetFlags().GetASM() + " ";
+    //             for (size_t i = 0; i < objASM.size(); i++) {
+    //                 if (!Util::NeedToRebuild(objASM[i], srcASM[i])/* && !Util::NeedToRebuild(objC[i], buildConfig)*/) continue;
+    //                 linkFlag = true;
+    //                 std::string cmd = cmdASM + "-c -o " + objASM[i] + " " + srcASM[i];
+    //                 std::cout << "Assembling " << srcASM[i] << " -> " << objASM[i] << std::endl;
+    //                 //std::cout << cmd << std::endl;
+    //                 Util::CreateDirFromFile(objASM[i]);
+    //                 system(cmd.c_str());
+    //             }
 
-                if (linkFlag) {
-                    std::string cmdLink = arch.GetTools().GetLD() + " ";
-                    cmdLink += "-o " + binOut + " ";
-                    for (auto obj : objC) {
-                        cmdLink += obj + " ";
-                    }
-                    for (auto obj : objCXX) {
-                        cmdLink += obj + " ";
-                    }
-                    for (auto obj : objASM) {
-                        cmdLink += obj + " ";
-                    }
-                    Util::CreateDirFromFile(binOut);
-                    cmdLink += arch.GetFlags().GetLD() + " " + config.GetFlags().GetLD() + " " + project.GetFlags().GetLD() + " " + workspace.GetFlags().GetLD() + " ";
-                    std::cout << "Linking " << binOut << std::endl;
-                    //std::cout << cmdLink << std::endl;
-                    system(cmdLink.c_str());
-                }
-            }
-        }
-    }
+    //             if (linkFlag) {
+    //                 std::string cmdLink = arch.GetTools().GetLD() + " ";
+    //                 cmdLink += "-o " + binOut + " ";
+    //                 for (auto obj : objC) {
+    //                     cmdLink += obj + " ";
+    //                 }
+    //                 for (auto obj : objCXX) {
+    //                     cmdLink += obj + " ";
+    //                 }
+    //                 for (auto obj : objASM) {
+    //                     cmdLink += obj + " ";
+    //                 }
+    //                 Util::CreateDirFromFile(binOut);
+    //                 cmdLink += arch.GetFlags().GetLD() + " " + config.GetFlags().GetLD() + " " + project.GetFlags().GetLD() + " " + workspace.GetFlags().GetLD() + " ";
+    //                 std::cout << "Linking " << binOut << std::endl;
+    //                 //std::cout << cmdLink << std::endl;
+    //                 system(cmdLink.c_str());
+    //             }
+    //         }
+    //     }
+    // }
 
     // std::vector<std::string> srcC;
     // for (std::string dir : project.GetFiles().GetIncludes)

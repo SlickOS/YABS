@@ -12,4 +12,5 @@ namespace Util {
     void CreateDir(const std::string &dir);
     void CleanDir(const std::string &dir);
     std::string ReplaceString(std::string subject, const std::string& search, const std::string& replace);
+    std::vector<std::string> Split(const std::string &str, char delim);
 }
