@@ -1,0 +1,13 @@
+Tools:
+  - C++
+
+Jobs:
+  - Name: Build
+    Variables:
+    Tasks:
+      - C++ Compile:
+          - Source: test.cpp
+          - Object: test.o
+      - C++ Link:
+          - Objects: test.cpp
+          - Output: test

@@ -8,7 +8,7 @@ Name: BTool
 ###############################################################################
 Output:
   Objects: Build/Objects/%(Architecture)/%(Configuration)/%(Project)/%(Object)
-  Binaries: Build/Binaries/%(Architecture)/%(Configuration)/%(Project)
+  Binaries: Build/%(Project)
 
 ###############################################################################
 # Global Options                                                              #

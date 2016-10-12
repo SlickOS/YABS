@@ -1,0 +1,41 @@
+Tools:
+  - C++
+
+Variables:
+  - C++Flags: -Wall -Wextra -IInclude -std=c++14
+  - LinkFlags: -LLibrary
+
+Configurations:
+  - Name: Debug
+    Variables:
+      - C++Flags: -g -DDEBUG
+  - Name: Develop
+    Variables:
+      - C++Flags: -g -O2 -DDEVELOP
+  - Name: Release
+    Variables:
+      - C++Flags: -O2 -DRELEASE
+
+Projects:
+  - Name: BTool
+    Configurations:
+      - Debug
+      - Develop
+      - Release
+    Variables:
+      - Libraries: yaml-cpp stdc++fs
+
+Jobs:
+  - Name: Build
+    Tasks:
+      - C++: Compile
+        Arguments:
+          - Flags: $C++Flags
+          - SourceDir: Source
+          - ObjectDir: Build/Objects/$Project
+      - C++: Link
+        Arguments:
+          - Flags: $LinkFlags
+          - ObjectDir: Build/Objects/$Project
+          - Libraries: $Libraries
+          - Binary: Build/Binaries/$Project
