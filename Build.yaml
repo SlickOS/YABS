@@ -1,0 +1,37 @@
+Name: BTool
+
+Variables:
+  - SourceDir: Source/
+  - ObjectDir: Build/Objects/
+  - Binary: Build/BTool
+
+Configurations:
+  - Name: Debug
+    Variables:
+      - C++Flags: -g -DDEBUG
+
+Targets:
+  - Name: Build
+    Variables:
+      - Sources: +Find($SourceDir, *.cpp)
+    Commands:
+      - For: Source - $Sources
+        Variables:
+          Object: +AddSuffix(+Replace($Source, $SourceDir, $ObjectDir), .o)
+        Commands:
+          - Shell: mkdir -p +Dir($Object)
+          - Shell: +Env(CXX) +Env(CXXFLAGS) +Env(CPPFLAGS) $C++Flags -c -o $Object $Source
+      - Shell: mkdir -p +Dir($Binary)
+      - Shell: +Env(CXX) +Env(CXXFLAGS) +Env(CPPFLAGS) $LinkFlags -o $Binary +Find($ObjectDir, *.o)
+  - Name: Clean
+    Commands:
+      - Shell: rm -rf $ObjectDir $Binary
+  - Name: Rebuild
+    Dependencies:
+      - Clean
+      - Build
+  - Name: Run
+    Dependencies:
+      - Build
+    Commands:
+      - Shell: $Binary
