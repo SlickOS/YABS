@@ -4,8 +4,8 @@ Projects:
   - Name: YABS
     Variables:
       - SourceDir: Source
-      - BinaryDir: Build
-      - ObjectDir: $BinaryDir/Objects
+      - BinaryDir: Build2
+      - ObjectDir: $BinaryDir/Objects2
       - Libraries: stdc++fs yaml-cpp
       - Binary: $BinaryDir/yabs
       - C++Flags: -Wall -Wextra -IInclude -std=c++14
@@ -30,3 +30,9 @@ Targets:
     Dependencies:
       - Clean
       - Build
+
+  - Name: Install
+    Dependencies:
+      - Build
+    Commands:
+      - Shell: cp $Binary /usr/local/bin/

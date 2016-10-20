@@ -14,6 +14,7 @@ Tasks:
         Variables:
           - Object: +AddSuffix(+Replace($Source, +Dir($Source), $ObjectDir), .o)
         Commands:
+          - Shell: echo Compiling $Source  from  $Object
           - Tool: Path Create(+Dir($Object))
           - Shell: $Compiler $Flags -c -o $Object $Source
 
@@ -24,5 +25,6 @@ Tasks:
       - Libraries
       - Output
     Commands:
-      - Tool: Path Create(+Dir($Object))
+      - Shell: echo Linking $Output
+      - Tool: Path Create(+Dir($Output))
       - Shell: $Compiler $Flags -o $Output $Objects +AddPrefix($Libraries, -l)

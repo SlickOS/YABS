@@ -186,27 +186,28 @@ bool YABS::Execute(const Command &command,
     }
     else if (type == "Shell") {
         // Execute the shell command.
-        //std::system(value.c_str());
+        std::system(value.c_str());
 
-        std::cout << value << std::endl;
+        // std::cout << value << std::endl;
     }
     else if (type == "Iterate") {
-        // auto pos = value.find_first_of(" ");
+        auto pos = value.find_first_of(" ");
 
-        // auto valVar = value.substr(0, pos);
-        // auto arrStr = value.substr(pos + 1);
+        auto valVar = value.substr(0, pos);
+        auto arrStr = value.substr(pos + 1);
 
-        // Util::Strip(arrStr);
-        // auto arr = Util::Split(arrStr, ' ');
+        Util::Strip(arrStr);
+        auto arr = Util::Split(arrStr, ' ');
 
-        // for (auto var : arr) {
-        //     auto variables = Util::AppendVariables(vars, command.Variables());
-        //     variables[valVar] = var;
+        for (auto var : arr) {
+            auto variables = Util::AppendVariables(vars, command.Variables());
+            variables[valVar] = var;
+            YABS::Expand(variables);
 
-        //     for (auto &cmd : command.Commands()) {
-        //         YABS::Execute(cmd, target, project, platform, configuration, variables, tools);
-        //     }
-        // }
+            for (auto &cmd : command.Commands()) {
+                YABS::Execute(cmd, target, project, platform, configuration, variables, tools);
+            }
+        }
     }
 
     return true;
@@ -267,32 +268,27 @@ bool YABS::ParseFunctions(std::string &value) {
             }
             auto funcStr = value.substr(location + 1, end - location - 1);
             if (!funcStr.empty()) {
-                int parentheses = 0;
                 auto par = value.find_first_of("()", location);
                 auto start = par;
                 while (par != std::string::npos) {
                     if (value[par] == '(') {
-                        // auto secondary = value.substr(par);
-                        // //std::cout << "SECOND: " << secondary << std::endl;
-                        // YABS::ParseFunctions(secondary);
-                        parentheses++;
+                        auto str = value.substr(par);
+                        YABS::ParseFunctions(str);
+                        value = Util::ReplaceString(value, value.substr(par), str);
                     }
-                    else {
-                        parentheses--;
-                        if (parentheses == 0) {
-                            auto argStr = value.substr(start + 1, par - start - 1);
-                            auto args = Util::Split(argStr, ',');
-                            for (auto &arg : args) {
-                                Util::Strip(arg);
-                            }
-
-                            YABS::HandleFunction(funcStr, args);
-                            value = Util::ReplaceString(value, value.substr(location, par - location + 1), funcStr);
-
-                            break;
+                    else if (value[par] == ')') {
+                        auto argStr = value.substr(start + 1, par - start - 1);
+                        auto args = Util::Split(argStr, ',');
+                        for (auto &arg : args) {
+                            Util::Strip(arg);
                         }
+
+                        YABS::HandleFunction(funcStr, args);
+                        value = Util::ReplaceString(value, value.substr(location, par - location + 1), funcStr);
+
+                        break;
                     }
-                    par = value.find_first_of("()", par + 1);
+                    par++;
                 }
             }
         }
@@ -352,7 +348,6 @@ bool YABS::HandleFunction(std::string &function, std::vector<std::string> &args)
         }
 
         function = Util::ReplaceString(args[0], args[1], args[2]);
-        //std::cout << "REPLACE: " << function << std::endl;
         Util::Strip(function);
     }
     else if (function == "Dir") {
