@@ -1,9 +1,14 @@
-Name: BTool
+YABS-Version: 1
 
-Variables:
-  - SourceDir: Source/
-  - ObjectDir: Build/Objects/
-  - Binary: Build/BTool
+Projects:
+  - Name: YABS
+    Variables:
+      - SourceDir: Source/
+      - ObjectDir: Build/Objects/
+      - Libraries: stdc++fs yaml-cpp
+      - Binary: Build/yabs
+      - C++Flags: -Wall -Wextra -IInclude -std=c++14
+      - LinkFlags: -LLibrary
 
 Configurations:
   - Name: Debug
@@ -12,26 +17,15 @@ Configurations:
 
 Targets:
   - Name: Build
-    Variables:
-      - Sources: +Find($SourceDir, *.cpp)
     Commands:
-      - For: Source - $Sources
-        Variables:
-          Object: +AddSuffix(+Replace($Source, $SourceDir, $ObjectDir), .o)
-        Commands:
-          - Shell: mkdir -p +Dir($Object)
-          - Shell: +Env(CXX) +Env(CXXFLAGS) +Env(CPPFLAGS) $C++Flags -c -o $Object $Source
-      - Shell: mkdir -p +Dir($Binary)
-      - Shell: +Env(CXX) +Env(CXXFLAGS) +Env(CPPFLAGS) $LinkFlags -o $Binary +Find($ObjectDir, *.o)
+      - Tool: C++ Compile($C++Flags, +Find($SourceDir, *.cpp), $ObjectDir)
+      - Tool: C++ Link($LinkFlags, +Find($ObjectDir, *.o), $Libraries, $Binary)
+
   - Name: Clean
     Commands:
-      - Shell: rm -rf $ObjectDir $Binary
+      - Tool: Path Delete($ObjectDir $Binary)
+
   - Name: Rebuild
     Dependencies:
       - Clean
       - Build
-  - Name: Run
-    Dependencies:
-      - Build
-    Commands:
-      - Shell: $Binary

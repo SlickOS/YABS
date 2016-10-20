@@ -1,14 +1,14 @@
-#include "Tool.hpp"
+#include "Project.hpp"
 
 #include <iostream>
 #include "Util.hpp"
 
-bool Tool::Parse(const YAML::Node &node) {
+bool Project::Parse(const YAML::Node &node) {
     if (node["Name"]) {
         m_Name = node["Name"].as<std::string>();
     }
     else {
-        Util::PrintError("Tool missing name.", node);
+        Util::PrintError("Project missing name.", node);
         return false;
     }
 
@@ -22,11 +22,11 @@ bool Tool::Parse(const YAML::Node &node) {
         }
     }
 
-    if (node["Tasks"]) {
-        for (auto sub : node["Tasks"]) {
-            Task task;
-            task.Parse(sub);
-            m_Tasks.push_back(task);
+    if (node["Projects"]) {
+        for (auto sub : node["Projects"]) {
+            Project project;
+            project.Parse(sub);
+            m_Projects.push_back(project);
         }
     }
 

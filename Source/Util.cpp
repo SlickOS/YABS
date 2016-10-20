@@ -1,6 +1,8 @@
 #include "Util.hpp"
 
+#include <algorithm>
 #include <iostream>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -68,9 +70,38 @@ void split(const std::string &s, char delim, std::vector<std::string> &elems) {
     }
 }
 
+void Util::PrintError(const std::string &message, const YAML::Node &node) {
+    std::cerr << "Error: " << message << " [Line " << node.Mark().line << ", Column " << node.Mark().column << "]" << std::endl;
+}
 
 std::vector<std::string> Util::Split(const std::string &s, char delim) {
     std::vector<std::string> elems;
     split(s, delim, elems);
     return elems;
+}
+
+std::string &Util::LStrip(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+            std::not1(std::ptr_fun<int, int>(std::isspace))));
+    return s;
+}
+
+// trim from end
+std::string &Util::RStrip(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+            std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    return s;
+}
+
+// trim from both ends
+std::string &Util::Strip(std::string &s) {
+    return LStrip(RStrip(s));
+}
+
+std::map<std::string, std::string> Util::AppendVariables(const std::map<std::string, std::string> &lhs, const std::map<std::string, std::string> &rhs) {
+    std::map<std::string, std::string> ret = lhs;
+    ret = std::accumulate(rhs.begin(), rhs.end(), ret, [](std::map<std::string, std::string> &m, const std::pair<std::string, std::string> &p) {
+        return (m[p.first] += " " + p.second, m);
+    });
+    return ret;
 }

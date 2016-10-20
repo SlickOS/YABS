@@ -6,19 +6,17 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "Task.hpp"
-
-class Tool {
+class Project {
 public:
-    Tool(void) {}
+    Project(void) {}
     bool Parse(const YAML::Node &node);
 
     const std::string &Name(void) const { return m_Name; }
     const std::map<std::string, std::string> &Variables(void) const { return m_Variables; }
-    const std::vector<Task> &Tasks(void) const { return m_Tasks; }
+    const std::vector<Project> &Projects(void) const { return m_Projects; }
 
 private:
     std::string m_Name;
     std::map<std::string, std::string> m_Variables;
-    std::vector<Task> m_Tasks;
+    std::vector<Project> m_Projects;
 };

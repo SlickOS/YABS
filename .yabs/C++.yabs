@@ -1,0 +1,28 @@
+Name: C++
+
+Variables:
+  - Compiler: g++
+
+Tasks:
+  - Name: Compile
+    Variables:
+      - Flags
+      - Sources
+      - ObjectDir
+    Commands:
+      - Iterate: Source $Sources
+        Variables:
+          - Object: +AddSuffix(+Replace($Source, +Dir($Source), $ObjectDir), .o)
+        Commands:
+          - Tool: Path Create(+Dir($Object))
+          - Shell: $Compiler $Flags -c -o $Object $Source
+
+  - Name: Link
+    Variables:
+      - Flags
+      - Objects
+      - Libraries
+      - Output
+    Commands:
+      - Tool: Path Create(+Dir($Object))
+      - Shell: $Compiler $Flags -o $Output $Objects +AddPrefix($Libraries, -l)

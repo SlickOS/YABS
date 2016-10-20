@@ -1,14 +1,14 @@
-#include "Tool.hpp"
+#include "Platform.hpp"
 
 #include <iostream>
 #include "Util.hpp"
 
-bool Tool::Parse(const YAML::Node &node) {
+bool Platform::Parse(const YAML::Node &node) {
     if (node["Name"]) {
         m_Name = node["Name"].as<std::string>();
     }
     else {
-        Util::PrintError("Tool missing name.", node);
+        Util::PrintError("Platform missing name.", node);
         return false;
     }
 
@@ -19,14 +19,6 @@ bool Tool::Parse(const YAML::Node &node) {
                 std::string value = var.second.as<std::string>();
                 m_Variables[name] = value;
             }
-        }
-    }
-
-    if (node["Tasks"]) {
-        for (auto sub : node["Tasks"]) {
-            Task task;
-            task.Parse(sub);
-            m_Tasks.push_back(task);
         }
     }
 

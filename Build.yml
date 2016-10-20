@@ -8,7 +8,7 @@ Name: BTool
 ###############################################################################
 Output:
   Objects: Build/Objects/%(Architecture)/%(Configuration)/%(Project)/%(Object)
-  Binaries: Build/%(Project)
+  Binaries: ./%(Project)
 
 ###############################################################################
 # Global Options                                                              #
@@ -42,7 +42,7 @@ Configurations:
 # Project-Specific Options                                                    #
 ###############################################################################
 Projects:
-  - Name: BTool
+  - Name: yabs
     Files:
       Sources:
         - Source

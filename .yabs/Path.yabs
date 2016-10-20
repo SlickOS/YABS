@@ -1,0 +1,14 @@
+Name: Path
+
+Tasks:
+  - Name: Create
+    Variables:
+      - Directories
+    Commands:
+      - Shell: mkdir -p $Directories
+
+  - Name: Delete
+    Variables:
+      - Entries
+    Commands:
+      - Shell: rm -rf $Entries
