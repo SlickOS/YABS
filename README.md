@@ -26,11 +26,11 @@ Targets:
 The build file for YABS itself is as follows:
 ```yaml
 Projects:
-  - Name: Build
+  - Name: YABS
     Variables:
       - SourceDir: Source/
       - ObjectDir: Build/Objects/
-      - Binary: Build/build
+      - Binary: Build/yabs
 
 Configurations:
   - Name: Debug
