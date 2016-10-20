@@ -9,6 +9,7 @@ namespace Util {
     bool NeedToRebuild(const std::string &obj, const std::string &src);
     bool CheckDirFromFile(const std::string &name);
     bool CheckDir(const std::string &name);
+    std::string GetDirFromFile(const std::string &name);
     void CreateDirFromFile(const std::string &file);
     void CreateDir(const std::string &dir);
     void CleanDir(const std::string &dir);

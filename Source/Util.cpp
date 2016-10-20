@@ -41,6 +41,10 @@ bool Util::CheckDir(const std::string &name) {
     return fs::exists(fs::path(name));
 }
 
+std::string Util::GetDirFromFile(const std::string &name) {
+    return fs::path(name).parent_path().generic_string();
+}
+
 void Util::CreateDirFromFile(const std::string &name) {
     if (Util::CheckDirFromFile(name)) return;
     //std::cout << "Making Dir!" << std::endl;
