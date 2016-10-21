@@ -15,10 +15,12 @@ public:
 
     const std::string &Name(void) const { return m_Name; }
     const std::vector<std::string> &Variables(void) const { return m_Variables; }
+    const std::vector<std::pair<std::string, std::string> > &Conditions(void) const { return m_Conditions; }
     const std::vector<Command> &Commands(void) const { return m_Commands; }
 
 private:
     std::string m_Name;
     std::vector<std::string> m_Variables;
+    std::vector<std::pair<std::string, std::string> > m_Conditions;
     std::vector<Command> m_Commands;
 };

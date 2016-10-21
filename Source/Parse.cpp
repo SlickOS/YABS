@@ -55,17 +55,17 @@ bool YABS::Parse(const std::string &fileName, std::vector<Configuration> &config
 }
 
 bool YABS::Parse(std::vector<Tool> &tools) {
-    for (auto file : Util::FindFiles("/etc/yabs", "yabs")) {
+    for (auto file : Util::FindFiles("/etc/yabs", "yaml")) {
         Tool tool;
         tool.Parse(YAML::LoadFile(file));
         tools.push_back(tool);
     }
-    for (auto file : Util::FindFiles("~/.yabs", "yabs")) {
+    for (auto file : Util::FindFiles("~/.yabs", "yaml")) {
         Tool tool;
         tool.Parse(YAML::LoadFile(file));
         tools.push_back(tool);
     }
-    for (auto file : Util::FindFiles(".yabs", "yabs")) {
+    for (auto file : Util::FindFiles(".yabs", "yaml")) {
         Tool tool;
         tool.Parse(YAML::LoadFile(file));
         tools.push_back(tool);

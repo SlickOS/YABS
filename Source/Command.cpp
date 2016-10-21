@@ -23,6 +23,16 @@ bool Command::Parse(const YAML::Node &node) {
         }
     }
 
+    if (node["Conditions"]) {
+        for (auto sub : node["Conditions"]) {
+            for (auto condition : sub) {
+                std::string name = condition.first.as<std::string>();
+                std::string value = condition.second.as<std::string>();
+                m_Conditions.push_back(std::pair<std::string, std::string>(name, value));
+            }
+        }
+    }
+
     if (node["Commands"]) {
         for (auto sub : node["Commands"]) {
             Command command;

@@ -24,4 +24,7 @@ namespace YABS {
 
     bool ParseFunctions(std::string &value);
     bool HandleFunction(std::string &function, std::vector<std::string> &args);
+
+    bool HandleConditions(std::vector<std::pair<std::string, std::string> > &conditions, std::map<std::string, std::string> &variables);
+    bool HandleCondition(std::string &condition, std::vector<std::string> &args);
 }

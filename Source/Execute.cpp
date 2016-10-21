@@ -82,7 +82,7 @@ bool YABS::Execute(const Target &target,
 
                     // Execute Commands
                     for (auto command : target.Commands()) {
-                        YABS::Execute(command, target.Name(), project.Name(), std::string(), config.Name(), variables, tools);
+                        status = YABS::Execute(command, target.Name(), project.Name(), std::string(), config.Name(), variables, tools);
                     }
                 }
             }
@@ -174,9 +174,13 @@ bool YABS::Execute(const Command &command,
                         auto variables = Util::AppendVariables(tool.Variables(), taskVariables);
                         YABS::Expand(variables);
 
-                        // Execute the tool
-                        for (auto &cmd : task.Commands()) {
-                            YABS::Execute(cmd, target, project, platform, configuration, variables, tools);
+                        auto conds = task.Conditions();
+                        if (YABS::HandleConditions(conds, variables)) {
+                            // Execute the tool
+                            for (auto &cmd : task.Commands()) {
+                                if (!YABS::Execute(cmd, target, project, platform, configuration, variables, tools)) return false;
+                                //ERROR-INDUCE
+                            }
                         }
                     }
                 }
@@ -186,7 +190,7 @@ bool YABS::Execute(const Command &command,
     }
     else if (type == "Shell") {
         // Execute the shell command.
-        std::system(value.c_str());
+        if (std::system(value.c_str()) != 0) return false;
 
         // std::cout << value << std::endl;
     }
@@ -204,8 +208,16 @@ bool YABS::Execute(const Command &command,
             variables[valVar] = var;
             YABS::Expand(variables);
 
-            for (auto &cmd : command.Commands()) {
-                YABS::Execute(cmd, target, project, platform, configuration, variables, tools);
+            // Check Conditions
+            auto conditions = command.Conditions();
+            //std::cout << "ABOUT TO HANDLE CONDITIONS..." << std::endl;
+            //for (auto var : vars) {
+            //    std::cout << "  " << var.first << " = " << var.second << std::endl;
+            //}
+            if (YABS::HandleConditions(conditions, variables)) {
+                for (auto &cmd : command.Commands()) {
+                    YABS::Execute(cmd, target, project, platform, configuration, variables, tools);
+                }
             }
         }
     }
@@ -216,6 +228,7 @@ bool YABS::Execute(const Command &command,
 bool YABS::Expand(std::map<std::string, std::string> &variables) {
     for (auto &variable : variables) {
         YABS::Expand(variable.second, variables);
+        YABS::ParseFunctions(variable.second);
         Util::Strip(variable.second);
     }
     return true;
@@ -364,6 +377,41 @@ bool YABS::HandleFunction(std::string &function, std::vector<std::string> &args)
 
     return true;
 }
+
+bool YABS::HandleConditions(std::vector<std::pair<std::string, std::string> > &conditions, std::map<std::string, std::string> &variables) {
+    for (auto condition : conditions) {
+        std::string value = condition.second;
+        YABS::Expand(value, variables);
+        YABS::ParseFunctions(value);
+        auto words = Util::Split(value, ' ');
+        for (auto &word : words) {
+            Util::Strip(word);
+        }
+        if (!YABS::HandleCondition(condition.first, words)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool YABS::HandleCondition(std::string &condition, std::vector<std::string> &args) {
+    if (condition == "Newer") {
+        if (args.empty()) return true;
+        //std::cout << "ARGS: " << std::endl;
+        //for (auto arg: args) {
+        //    std::cout << "  " << arg << std::endl;
+        //}
+        auto size = args.size();
+        for (size_t i = 0; i < size - 1; i++) {
+            if (Util::NeedToRebuild(args[size - 1], args[i])) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+
 
 
 

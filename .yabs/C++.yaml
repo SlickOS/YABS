@@ -13,6 +13,8 @@ Tasks:
       - Iterate: Source $Sources
         Variables:
           - Object: +AddSuffix(+Replace($Source, +Dir($Source), $ObjectDir), .o)
+        Conditions:
+          - Newer: $Source $Object
         Commands:
           - Shell: echo Compiling $Source  from  $Object
           - Tool: Path Create(+Dir($Object))
@@ -24,6 +26,8 @@ Tasks:
       - Objects
       - Libraries
       - Output
+    Conditions:
+      - Newer: $Objects $Output
     Commands:
       - Shell: echo Linking $Output
       - Tool: Path Create(+Dir($Output))
