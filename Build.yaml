@@ -4,10 +4,12 @@ Projects:
   - Name: YABS
     Variables:
       - SourceDir: Source
-      - BinaryDir: Build
-      - ObjectDir: $BinaryDir/Objects
+      - BuildDir: Build
+      - ObjectDir: $BuildDir/Objects
+
       - Libraries: stdc++fs yaml-cpp
-      - Binary: $BinaryDir/yabs
+      - Binary: $BuildDir/yabs
+      
       - C++Flags: -Wall -Wextra -IInclude -std=c++14
       - LinkFlags: -LLibrary
 
@@ -24,7 +26,7 @@ Targets:
 
   - Name: Clean
     Commands:
-      - Tool: Path Delete($BinaryDir)
+      - Tool: Path Delete($BuildDir)
 
   - Name: Rebuild
     Dependencies:

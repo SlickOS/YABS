@@ -1,5 +1,6 @@
 #include "YABS.hpp"
 
+#include <algorithm>
 #include <iostream>
 
 #include "Util.hpp"
@@ -58,17 +59,35 @@ bool YABS::Parse(std::vector<Tool> &tools) {
     for (auto file : Util::FindFiles("/etc/yabs", "yaml")) {
         Tool tool;
         tool.Parse(YAML::LoadFile(file));
-        tools.push_back(tool);
+        auto it = std::find_if(tools.begin(), tools.end(), [&n = tool](const Tool &t) { return t.Name() == n.Name(); });
+        if (it != tools.end()) {
+            *it = tool;
+        }
+        else {
+            tools.push_back(tool);
+        }
     }
     for (auto file : Util::FindFiles("~/.yabs", "yaml")) {
         Tool tool;
         tool.Parse(YAML::LoadFile(file));
-        tools.push_back(tool);
+        auto it = std::find_if(tools.begin(), tools.end(), [&n = tool](const Tool &t) { return t.Name() == n.Name(); });
+        if (it != tools.end()) {
+            *it = tool;
+        }
+        else {
+            tools.push_back(tool);
+        }
     }
     for (auto file : Util::FindFiles(".yabs", "yaml")) {
         Tool tool;
         tool.Parse(YAML::LoadFile(file));
-        tools.push_back(tool);
+        auto it = std::find_if(tools.begin(), tools.end(), [&n = tool](const Tool &t) { return t.Name() == n.Name(); });
+        if (it != tools.end()) {
+            *it = tool;
+        }
+        else {
+            tools.push_back(tool);
+        }
     }
 
     return true;

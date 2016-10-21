@@ -1,5 +1,6 @@
 #include "YABS.hpp"
 
+#include <csignal>
 #include <iostream>
 
 #include "Util.hpp"
@@ -190,7 +191,13 @@ bool YABS::Execute(const Command &command,
     }
     else if (type == "Shell") {
         // Execute the shell command.
-        if (std::system(value.c_str()) != 0) return false;
+        auto status = std::system(value.c_str());
+        if (status != 0) {
+            if (WIFSIGNALED(status)) {
+                exit(SIGTERM);
+            }
+            return false;
+        }
 
         // std::cout << value << std::endl;
     }
