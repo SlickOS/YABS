@@ -36,4 +36,5 @@ Targets:
       - Build
     Commands:
       - Shell: cp $Binary /usr/local/bin/YABS_BINARY
+      - Shell: cp -ar .yabs /etc/yabs
       - Shell: mv /usr/local/bin/YABS_BINARY /usr/local/bin/yabs
