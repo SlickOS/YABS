@@ -12,6 +12,9 @@ bool Command::Parse(const YAML::Node &node) {
     else if (node["Shell"]) {
         m_Type = std::pair<std::string, std::string>("Shell", node["Shell"].as<std::string>());
     }
+    else if (node["Persistence"]) {
+        m_Type = std::pair<std::string, std::string>("Persistence", node["Persistence"].as<std::string>());
+    }
 
     if (node["Variables"]) {
         for (auto sub : node["Variables"]) {

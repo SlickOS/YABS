@@ -3,12 +3,32 @@ Name: Path
 Tasks:
   - Name: Create
     Variables:
-      - Directories
+      - Target
     Commands:
-      - Shell: mkdir -p $Directories
+      - Shell: mkdir -p $Target
 
   - Name: Delete
     Variables:
-      - Entries
+      - Target
     Commands:
       - Shell: rm -rf $Entries
+
+  - Name: Change
+    Variables:
+      - Target
+    Commands:
+      - Shell: cd $Target
+
+  - Name: Create-Change
+    Variables:
+      - Target
+    Commands:
+      - Tool: Path Create($Target)
+      - Tool: Path Change($Target)
+
+  - Name: Copy
+    Variables:
+      - Source
+      - Target
+    Commands:
+      - Shell: cp -ar $Source $Target

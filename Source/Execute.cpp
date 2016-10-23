@@ -1,8 +1,12 @@
 #include "YABS.hpp"
 
+#include <csignal>
 #include <iostream>
 
 #include "Util.hpp"
+
+static bool g_Persistence = false;
+static std::string g_PersistentString;
 
 bool YABS::Execute(const Target &target,
                     const Project &project,
@@ -190,7 +194,18 @@ bool YABS::Execute(const Command &command,
     }
     else if (type == "Shell") {
         // Execute the shell command.
-        if (std::system(value.c_str()) != 0) return false;
+        if (YABS::Persistence()) {
+            g_PersistentString += value + " && ";
+        }
+        else {
+            auto status = std::system(value.c_str());
+            if (status != 0) {
+                if (WIFSIGNALED(status)) {
+                    exit(SIGTERM);
+                }
+                return false;
+            }
+        }
 
         // std::cout << value << std::endl;
     }
@@ -219,6 +234,24 @@ bool YABS::Execute(const Command &command,
                     YABS::Execute(cmd, target, project, platform, configuration, variables, tools);
                 }
             }
+        }
+    }
+    else if (type == "Persistence") {
+        if (value == "Start") {
+            YABS::SetPersistence(true);
+        }
+        else if (value == "End") {
+            YABS::SetPersistence(false);
+            g_PersistentString = g_PersistentString.substr(0, g_PersistentString.size() - 4);
+            auto status = std::system(g_PersistentString.c_str());
+            if (status != 0) {
+                if (WIFSIGNALED(status)) {
+                    exit(SIGTERM);
+                }
+                return false;
+            }
+            // std::cout << g_PersistentString << std::endl;
+            g_PersistentString.clear();
         }
     }
 
@@ -411,6 +444,8 @@ bool YABS::HandleCondition(std::string &condition, std::vector<std::string> &arg
     return false;
 }
 
+bool YABS::Persistence(void) { return g_Persistence; }
+void YABS::SetPersistence(bool persistence) { g_Persistence = persistence; }
 
 
 

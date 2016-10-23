@@ -16,7 +16,7 @@ Tasks:
         Conditions:
           - Newer: $Source $Object
         Commands:
-          - Shell: echo Compiling $Source  from  $Object
+          - Shell: echo Compiling $Source to $Object
           - Tool: Path Create(+Dir($Object))
           - Shell: $Compiler $Flags -c -o $Object $Source
 

@@ -1,21 +1,52 @@
 YABS-Version: 1
 
+###############################################################################
+# Projects                                                                    #
+#  - Debug: Adds debugging symbols to the binary.                             #
+#  - Develop: Adds debugging symbols to the binary and turn on optimizations. #
+#  - Release: Turns on optimizations.                                         #
+###############################################################################
 Projects:
   - Name: YABS
     Variables:
       - SourceDir: Source
-      - BinaryDir: Build
-      - ObjectDir: $BinaryDir/Objects
+      - BuildDir: Build
+      - ObjectDir: $BuildDir/Objects
+
       - Libraries: stdc++fs yaml-cpp
-      - Binary: $BinaryDir/yabs
+      - Binary: $BuildDir/yabs
+      
       - C++Flags: -Wall -Wextra -IInclude -std=c++14
       - LinkFlags: -LLibrary
 
+      - Compiler: C++
+
+###############################################################################
+# Configurations                                                              #
+#  - Debug: Adds debugging symbols to the binary.                             #
+#  - Develop: Adds debugging symbols to the binary and turn on optimizations. #
+#  - Release: Turns on optimizations.                                         #
+###############################################################################
 Configurations:
   - Name: Debug
     Variables:
       - C++Flags: -g -DDEBUG
+  - Name: Develop
+    Variables:
+      - C++Flags: -g -O2 -DDEVELOP
+  - Name: Release
+    Variables:
+      - C++Flags: -O2 -DRELEASE
 
+###############################################################################
+# Targets                                                                     #
+#  - Build: Compiles and links all source files.                              #
+#  - Clean: Removes all object files and binaries.                            #
+#  - Rebuild: First executes the 'Clean' target, and then the 'Build' target. #
+#  - Install: Copies the binary and all tool definitions to the $PATH.        #
+#  - Test: Runs the test suite.                                               #
+#  - Dependencies: Builds the 'yaml-cpp' library.                             #
+###############################################################################
 Targets:
   - Name: Build
     Commands:
@@ -24,7 +55,7 @@ Targets:
 
   - Name: Clean
     Commands:
-      - Tool: Path Delete($BinaryDir)
+      - Tool: Path Delete($BuildDir)
 
   - Name: Rebuild
     Dependencies:
@@ -38,3 +69,26 @@ Targets:
       - Shell: cp $Binary /usr/local/bin/YABS_BINARY
       - Shell: cp -ar .yabs /etc/yabs
       - Shell: mv /usr/local/bin/YABS_BINARY /usr/local/bin/yabs
+
+  - Name: Test
+    Dependencies:
+      - Build
+
+  - Name: Dependencies
+    Commands:
+      - Persistence: Start
+      - Tool: Path Create(Library)
+      - Tool: Path Create(Include)
+      - Tool: Path Create-Change(Dependencies)
+
+      - Shell: git clone https://github.com/jbeder/yaml-cpp
+      - Tool: Path Change(yaml-cpp)
+
+      - Tool: Path Create-Change(Build)
+      - Shell: cmake ../
+      - Shell: make
+
+      - Tool: Path Copy(libyaml-cpp.a, ../../../Library/)
+      - Tool: Path Change(../)
+      - Tool: Path Copy(include/., ../../Include)
+      - Persistence: End
