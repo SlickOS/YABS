@@ -11,7 +11,7 @@ Tasks:
     Variables:
       - Target
     Commands:
-      - Shell: rm -rf $Entries
+      - Shell: rm -rf $Target
 
   - Name: Change
     Variables:
