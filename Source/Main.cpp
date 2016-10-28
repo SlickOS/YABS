@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include "Configuration.hpp"
-#include "Platform.hpp"
-#include "Project.hpp"
-#include "Target.hpp"
-#include "Tool.hpp"
+#include "Types/Configuration.hpp"
+#include "Types/Platform.hpp"
+#include "Types/Project.hpp"
+#include "Types/Target.hpp"
+#include "Types/Tool.hpp"
 #include "Util.hpp"
 #include "YABS.hpp"
 
@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
     //     }
     // }
     // else {
-    //     Util::PrintError("No projects defined.", root);
+    //     Util::PrintYAMLError("No projects defined.", root);
     // }
 
     // // Parse All Targets
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
     //     }
     // }
     // else {
-    //     Util::PrintError("No targets defined.", root);
+    //     Util::PrintYAMLError("No targets defined.", root);
     // }
 
     // for (auto project : projects) {
