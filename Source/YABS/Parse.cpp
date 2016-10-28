@@ -1,9 +1,9 @@
-#include "YABS.hpp"
+#include "../YABS.hpp"
 
 #include <algorithm>
 #include <iostream>
 
-#include "Util.hpp"
+#include "../Util.hpp"
 
 bool YABS::Parse(const std::string &fileName, std::vector<Configuration> &configurations, std::vector<Platform> &platforms, std::vector<Project> &projects, std::vector<Target> &targets) {
     YAML::Node root = YAML::LoadFile(fileName);

@@ -1,6 +1,7 @@
 Build/
 Dependencies/
 Include/
+Library/
 
 .DS_Store
 .DS_Store?

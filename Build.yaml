@@ -86,7 +86,7 @@ Targets:
 
       - Tool: Path Create-Change(Build)
       - Shell: cmake ../
-      - Shell: make
+      - Shell: make VERBOSE=1
 
       - Tool: Path Copy(libyaml-cpp.a, ../../../Library/)
       - Tool: Path Change(../)
