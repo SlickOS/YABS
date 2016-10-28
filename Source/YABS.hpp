@@ -3,11 +3,11 @@
 #include <string>
 #include <vector>
 
-#include "Configuration.hpp"
-#include "Platform.hpp"
-#include "Project.hpp"
-#include "Target.hpp"
-#include "Tool.hpp"
+#include "Types/Configuration.hpp"
+#include "Types/Platform.hpp"
+#include "Types/Project.hpp"
+#include "Types/Target.hpp"
+#include "Types/Tool.hpp"
 
 namespace YABS {
     bool Parse(const std::string &fileName, std::vector<Configuration> &configurations, std::vector<Platform> &platforms, std::vector<Project> &projects, std::vector<Target> &targets);
@@ -30,4 +30,5 @@ namespace YABS {
 
     bool Persistence(void);
     void SetPersistence(bool persistence);
+    std::string &PersistenceString(void);
 }
